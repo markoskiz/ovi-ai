@@ -3,6 +3,9 @@
 Ова е воведната пајтон скрипта по предметот Машинско учење.
 
 """
+import math
+from time import sleep
+import graph
 
 # ова е коментар
 
@@ -110,6 +113,17 @@ def sum_two(arg1, arg2):
 print(sum_two(3, 4))
 print(sum_two('3', '4'))
 
+
+def my_function(arg1, arg2, arg3=45, arg4=.2, arg5='Abc'):
+    print(arg1, arg2, arg3, arg4, arg5)
+
+my_function(2, 3, arg5='abc')
+
+for index in range(3):
+    print(index)
+    sleep(3)
+
+
 # ова е речник, структура од соодветни парови на клуч и вредност
 colors = {
    "Red": (1, 0, 0),
@@ -137,3 +151,58 @@ for line in lines:
     colors[key] = value.strip().split()
 
 print(colors)
+
+
+class OneWheelRobot:
+    def __init__(self, heading, start_x, start_y):
+        self.heading = heading
+        self.x = start_x
+        self.y = start_y
+
+    def set_heading(self, new_heading):
+        self.heading = new_heading
+
+    def move(self, step):
+        self.x += step * math.cos(self.heading)
+        self.y += step * math.sin(self.heading)
+
+    def __str__(self):
+        return 'Роботот се наоѓа на координати ({}, {}) под агол {}'.format(self.x, self.y, self.heading)
+
+robot = OneWheelRobot(math.pi, 3, 5)
+print(robot)
+print()
+
+
+cities = {"Скопје": ["Загреб"],
+          "Белград": ["Загреб", "Подгорица"],
+          "Загреб": ["Скопје", "Белград", "Сараево", "Подгорица"],
+          "Сараево": ["Загреб"],
+          "Подгорица": ["Загреб", "Белград"],
+          "Софија": []
+          }
+
+graph = graph.Graph(cities)
+
+print(graph)
+print()
+
+print('Ја додаваме Љубљана')
+graph.add_vertex("Љубљана")
+print(graph)
+print()
+
+print('Додаваме лет Загреб -> Љубљана')
+graph.add_edge(('Загреб', 'Љубљана'))
+print(graph)
+print()
+
+print('Го бришеме Загреб')
+graph.remove_vertex('Загреб')
+print(graph)
+print()
+
+print('Го бришеме летот Белград - Подгорица')
+graph.remove_edge(('Белград', 'Подгорица'), remove_reversed=False)
+print(graph)
+print()
