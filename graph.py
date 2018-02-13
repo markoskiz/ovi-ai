@@ -2,8 +2,8 @@ from collections import defaultdict
 
 
 class Graph(object):
-    def __init__(self, graph_dict=None):
-        self.graph_dict = defaultdict(list) if graph_dict is None else graph_dict
+    def __init__(self, graph_dict=defaultdict(list)):
+        self.graph_dict = graph_dict
 
     def vertices(self):
         return list(self.graph_dict.keys())
@@ -19,7 +19,7 @@ class Graph(object):
         if vertex not in self.graph_dict:
             self.graph_dict[vertex] = []
 
-    def add_edge(self, edge, add_reversed=False):
+    def add_edge(self, edge, add_reversed=True):
         vertex1, vertex2 = edge
         self.graph_dict[vertex1].append(vertex2)
         if add_reversed:
@@ -38,6 +38,13 @@ class Graph(object):
         if remove_reversed:
             if vertex1 in self.graph_dict[vertex2]:
                 self.graph_dict[vertex2].remove(vertex1)
+
+    def isolated_verices(self):
+        isolated_vertices = []
+        for vertex in self.graph_dict:
+            if not self.graph_dict[vertex]:
+                isolated_vertices.append(vertex)
+        return isolated_vertices
 
     def __str__(self):
         return 'Vertices: {}\nEdges: {}'.format(self.vertices(), self.edges())

@@ -117,6 +117,7 @@ print(sum_two('3', '4'))
 def my_function(arg1, arg2, arg3=45, arg4=.2, arg5='Abc'):
     print(arg1, arg2, arg3, arg4, arg5)
 
+
 my_function(2, 3, arg5='abc')
 
 for index in range(3):
@@ -169,6 +170,7 @@ class OneWheelRobot:
     def __str__(self):
         return 'Роботот се наоѓа на координати ({}, {}) под агол {}'.format(self.x, self.y, self.heading)
 
+
 robot = OneWheelRobot(math.pi, 3, 5)
 print(robot)
 print()
@@ -182,27 +184,29 @@ cities = {"Скопје": ["Загреб"],
           "Софија": []
           }
 
-graph = graph.Graph(cities)
+g = graph.Graph(cities)
+print(g, '\n')
 
-print(graph)
+print('Ова е листа на изолирани градови. Значи ако загливите тука не одите никаде')
+print(g.isolated_verices(), '\n')
 print()
 
 print('Ја додаваме Љубљана')
-graph.add_vertex("Љубљана")
-print(graph)
+g.add_vertex("Љубљана")
+print(g)
 print()
 
 print('Додаваме лет Загреб -> Љубљана')
-graph.add_edge(('Загреб', 'Љубљана'))
-print(graph)
+g.add_edge(('Загреб', 'Љубљана'))
+print(g)
 print()
 
 print('Го бришеме Загреб')
-graph.remove_vertex('Загреб')
-print(graph)
+g.remove_vertex('Загреб')
+print(g)
 print()
 
 print('Го бришеме летот Белград - Подгорица')
-graph.remove_edge(('Белград', 'Подгорица'), remove_reversed=False)
-print(graph)
+g.remove_edge(('Белград', 'Подгорица'), remove_reversed=False)
+print(g)
 print()
