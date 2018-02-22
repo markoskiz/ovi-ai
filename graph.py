@@ -31,7 +31,7 @@ class Graph(object):
             if vertex_to_remove in self.graph_dict[vertex]:
                 self.graph_dict[vertex].remove(vertex_to_remove)
 
-    def remove_edge(self, edge_to_remove, remove_reversed=False):
+    def remove_edge(self, edge_to_remove, remove_reversed=True):
         vertex1, vertex2 = edge_to_remove
         if vertex2 in self.graph_dict[vertex1]:
             self.graph_dict[vertex1].remove(vertex2)
