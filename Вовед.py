@@ -188,7 +188,7 @@ g = graph.Graph(cities)
 print(g, '\n')
 
 print('Ова е листа на изолирани градови. Значи ако загливите тука не одите никаде')
-print(g.isolated_verices(), '\n')
+print(g.isolated_vertices(), '\n')
 print()
 
 print('Ја додаваме Љубљана')
