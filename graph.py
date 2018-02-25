@@ -39,7 +39,7 @@ class Graph(object):
             if vertex1 in self.graph_dict[vertex2]:
                 self.graph_dict[vertex2].remove(vertex1)
 
-    def isolated_verices(self):
+    def isolated_vertices(self):
         isolated_vertices = []
         for vertex in self.graph_dict:
             if not self.graph_dict[vertex]:
