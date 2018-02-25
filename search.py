@@ -1,5 +1,6 @@
 from collections import deque
-from graph import Graph
+from graph import Graph, WeightedGraph
+import heapq
 
 
 def breadth_first_search_traversal(graph, starting_vertex, goal_vertex=None, verbose=False):
@@ -104,7 +105,6 @@ def breadth_first_search_find_path(graph, starting_vertex, goal_vertex, verbose=
         if verbose:
             print('Почетниот и бараниот јазол се исти')
         return []
-    visited = {starting_vertex}
     queue = deque([[starting_vertex]])
     while queue:
         if verbose:
@@ -114,22 +114,22 @@ def breadth_first_search_find_path(graph, starting_vertex, goal_vertex, verbose=
             print()
             print()
         vertex_list = queue.popleft()
+        vertex_to_expand = vertex_list[-1]
         if verbose:
-            print('Го разгрануваме јазолот {}'.format(vertex_list[-1]))
-        for neighbour in graph[vertex_list[-1]]:
-            if neighbour in visited:
+            print('Го разгрануваме јазолот {}'.format(vertex_to_expand))
+        for neighbour in graph[vertex_to_expand]:
+            if neighbour in vertex_list:
                 if verbose:
                     print('{} е веќе посетен'.format(neighbour))
             else:
                 if verbose:
                     print('{}, кој е соседен јазол на {} го немаме посетено до сега, затоа го додаваме во редот '
-                          'за разгранување и го означуваме како посетен'.format(neighbour, vertex_list[-1]))
+                          'за разгранување и го означуваме како посетен'.format(neighbour, vertex_to_expand))
                 if neighbour == goal_vertex:
                     if verbose:
                         print('Го пронајдовме посакуваниот јазол {}. Патеката да стигнеме до тука е {}'
                               .format(neighbour, vertex_list + [neighbour]))
                     return vertex_list + [neighbour]
-                visited.add(neighbour)
                 queue.append(vertex_list + [neighbour])
         if verbose:
             print()
@@ -149,7 +149,6 @@ def depth_first_search_find_path(graph, starting_vertex, goal_vertex, verbose=Fa
         if verbose:
             print('Почетниот и бараниот јазол се исти')
         return
-    visited = {starting_vertex}
     queue = deque([[starting_vertex]])
     while queue:
         if verbose:
@@ -159,23 +158,74 @@ def depth_first_search_find_path(graph, starting_vertex, goal_vertex, verbose=Fa
             print()
             print()
         vertex_list = queue.popleft()
+        vertex_to_expand = vertex_list[-1]
         if verbose:
-            print('Го разгрануваме јазолот {}'.format(vertex_list[-1]))
-        for neighbour in graph[vertex_list[-1]]:
-            if neighbour in visited:
+            print('Го разгрануваме јазолот {}'.format(vertex_to_expand))
+        for neighbour in graph[vertex_to_expand]:
+            if neighbour in vertex_list:
                 if verbose:
                     print('{} е веќе посетен'.format(neighbour))
             else:
                 if verbose:
                     print('{}, кој е соседен јазол на {} го немаме посетено до сега, затоа го додаваме во редот '
-                          'за разгранување и го означуваме како посетен'.format(neighbour, vertex_list[-1]))
+                          'за разгранување и го означуваме како посетен'.format(neighbour, vertex_to_expand))
                 if neighbour == goal_vertex:
                     if verbose:
                         print('Го пронајдовме посакуваниот јазол {}. Патеката да стигнеме до тука е {}'
                               .format(neighbour, vertex_list + [neighbour]))
                     return vertex_list + [neighbour]
-                visited.add(neighbour)
                 queue.appendleft(vertex_list + [neighbour])
+        if verbose:
+            print()
+
+
+def djikstra(graph, starting_vertex, goal_vertex, verbose=False):
+    """
+    Djikstra's algorithm
+
+    :param graph: graph dictionary to traverse
+    :param starting_vertex: vertext to start from
+    :param goal_vertex: vertex to look for
+    :param verbose: True for debug options
+    :returns: optimal path from starting vertex to goal vertex
+    """
+    if starting_vertex == goal_vertex:
+        if verbose:
+            print('Почетниот и бараниот јазол се исти')
+        return
+    expanded = set()
+    queue = [(0, [starting_vertex])]
+    heapq.heapify(queue)
+    while queue:
+        if verbose:
+            print('Ред за разгранување:')
+            for element in queue:
+                print(element, end=' ')
+            print()
+            print()
+        weight, vertex_list = heapq.heappop(queue)
+        vertex_to_expand = vertex_list[-1]
+        if vertex_to_expand == goal_vertex:
+            if verbose:
+                print('Го пронајдовме посакуваниот јазол {}. Патеката да стигнеме до тука е {} со цена {}'
+                      .format(vertex_to_expand, vertex_list, weight))
+            return weight, vertex_list
+        if vertex_to_expand in expanded:
+            if verbose:
+                print('{} е веќе разгранет'.format(vertex_to_expand, weight, vertex_list))
+            continue
+        if verbose:
+            print('Го разгрануваме јазолот {} од ({}, {})'.format(vertex_to_expand, weight, vertex_list))
+        for neighbour, new_weight in graph[vertex_to_expand].items():
+            if neighbour in expanded:
+                if verbose:
+                    print('{} е веќе разгранет'.format(neighbour))
+            else:
+                if verbose:
+                    print('{} со тежина {}, кој е соседен јазол на {}, го додаваме во редот за разгранување со нова '
+                          'цена и го означуваме како посетен'.format(neighbour, new_weight, vertex_to_expand))
+                heapq.heappush(queue, (weight + new_weight, vertex_list + [neighbour]))
+        expanded.add(vertex_to_expand)
         if verbose:
             print()
 
@@ -193,7 +243,24 @@ g.add_edge(('I', 'J'))
 g.add_edge(('J', 'A'))
 g.add_edge(('C', 'H'))
 
-depth_first_search_traversal(graph=g.graph_dict, starting_vertex='C', goal_vertex='A', verbose=True)
+depth_first_search_traversal(graph=g.graph_dict, starting_vertex='A', goal_vertex='F', verbose=True)
 
 path = breadth_first_search_find_path(graph=g.graph_dict, starting_vertex='A', goal_vertex='F')
 print(path)
+
+
+wg = WeightedGraph()
+wg.add_edge(('A', 'B'), 1)
+wg.add_edge(('B', 'C'), 6)
+wg.add_edge(('C', 'D'), 3)
+wg.add_edge(('D', 'E'), 8)
+wg.add_edge(('E', 'F'), 2)
+wg.add_edge(('F', 'G'), 5)
+wg.add_edge(('G', 'H'), 1)
+wg.add_edge(('H', 'I'), 8)
+wg.add_edge(('I', 'J'), 4)
+wg.add_edge(('J', 'A'), 3)
+wg.add_edge(('C', 'H'), 2)
+
+cost, path = djikstra(wg.graph_dict, 'A', 'F', True)
+print(cost, path)
