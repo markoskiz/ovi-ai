@@ -223,7 +223,7 @@ def djikstra(graph, starting_vertex, goal_vertex, verbose=False):
             else:
                 if verbose:
                     print('{} со тежина {}, кој е соседен јазол на {}, го додаваме во редот за разгранување со нова '
-                          'цена и го означуваме како посетен'.format(neighbour, new_weight, vertex_to_expand))
+                          'цена и го означуваме како разгранет'.format(neighbour, new_weight, vertex_to_expand))
                 heapq.heappush(queue, (weight + new_weight, vertex_list + [neighbour]))
         expanded.add(vertex_to_expand)
         if verbose:
@@ -250,17 +250,15 @@ print(path)
 
 
 wg = WeightedGraph()
-wg.add_edge(('A', 'B'), 1)
-wg.add_edge(('B', 'C'), 6)
-wg.add_edge(('C', 'D'), 3)
-wg.add_edge(('D', 'E'), 8)
-wg.add_edge(('E', 'F'), 2)
-wg.add_edge(('F', 'G'), 5)
-wg.add_edge(('G', 'H'), 1)
-wg.add_edge(('H', 'I'), 8)
-wg.add_edge(('I', 'J'), 4)
-wg.add_edge(('J', 'A'), 3)
-wg.add_edge(('C', 'H'), 2)
+wg.add_edge(('A', 'B'), 7)
+wg.add_edge(('B', 'C'), 10)
+wg.add_edge(('A', 'C'), 9)
+wg.add_edge(('B', 'D'), 15)
+wg.add_edge(('C', 'D'), 11)
+wg.add_edge(('A', 'E'), 14)
+wg.add_edge(('C', 'E'), 2)
+wg.add_edge(('E', 'F'), 9)
+wg.add_edge(('F', 'D'), 6)
 
 cost, path = djikstra(wg.graph_dict, 'A', 'F', True)
 print(cost, path)
