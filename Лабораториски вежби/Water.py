@@ -7,7 +7,7 @@ def transfer_to_other_glass(source, sink, sink_capacity):
 
 
 def expand_state(state):
-    capacities = (5, 7, 4)
+    capacities = (5, 8, 10)
     glass_0, glass_1, glass_2 = state
 
     new_states = []
@@ -17,11 +17,7 @@ def expand_state(state):
     return new_states
 
 
-def search_path():
-    water_level = (5, 8, 10)
-    initial_state = water_level
-    goal_state = 1
-
+def search_path(initial_state, goal_state):
     states_queue = deque([[initial_state]])
     while states_queue:
         states_list = states_queue.popleft()
@@ -31,19 +27,22 @@ def search_path():
                 if next_state[0] == goal_state:
                     return states_list + [next_state]
                 states_queue.append(states_list + [next_state])
+    return []
 
 
 def visualise_path(path):
     for states in zip(path, path[1:]):
         old_state, new_state = states
-        print()
         print(old_state)
         print(tuple(map(lambda x, y: x - y, new_state, old_state)), 'change')
         print(new_state)
+        print()
 
 
 def main():
-    path = search_path()
+    initial_state = (0, 0, 0)
+    goal_state = 1
+    path = search_path(initial_state, goal_state)
     visualise_path(path)
 
 
