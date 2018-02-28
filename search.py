@@ -105,6 +105,7 @@ def breadth_first_search_find_path(graph, starting_vertex, goal_vertex, verbose=
         if verbose:
             print('Почетниот и бараниот јазол се исти')
         return []
+    visited = {starting_vertex}
     queue = deque([[starting_vertex]])
     while queue:
         if verbose:
@@ -118,7 +119,7 @@ def breadth_first_search_find_path(graph, starting_vertex, goal_vertex, verbose=
         if verbose:
             print('Го разгрануваме јазолот {}'.format(vertex_to_expand))
         for neighbour in graph[vertex_to_expand]:
-            if neighbour in vertex_list:
+            if neighbour in visited:
                 if verbose:
                     print('{} е веќе посетен'.format(neighbour))
             else:
@@ -130,6 +131,7 @@ def breadth_first_search_find_path(graph, starting_vertex, goal_vertex, verbose=
                         print('Го пронајдовме посакуваниот јазол {}. Патеката да стигнеме до тука е {}'
                               .format(neighbour, vertex_list + [neighbour]))
                     return vertex_list + [neighbour]
+                visited.add(neighbour)
                 queue.append(vertex_list + [neighbour])
         if verbose:
             print()
@@ -149,6 +151,7 @@ def depth_first_search_find_path(graph, starting_vertex, goal_vertex, verbose=Fa
         if verbose:
             print('Почетниот и бараниот јазол се исти')
         return
+    visited = {starting_vertex}
     queue = deque([[starting_vertex]])
     while queue:
         if verbose:
@@ -162,7 +165,7 @@ def depth_first_search_find_path(graph, starting_vertex, goal_vertex, verbose=Fa
         if verbose:
             print('Го разгрануваме јазолот {}'.format(vertex_to_expand))
         for neighbour in graph[vertex_to_expand]:
-            if neighbour in vertex_list:
+            if neighbour in visited:
                 if verbose:
                     print('{} е веќе посетен'.format(neighbour))
             else:
@@ -174,6 +177,7 @@ def depth_first_search_find_path(graph, starting_vertex, goal_vertex, verbose=Fa
                         print('Го пронајдовме посакуваниот јазол {}. Патеката да стигнеме до тука е {}'
                               .format(neighbour, vertex_list + [neighbour]))
                     return vertex_list + [neighbour]
+                visited.add(neighbour)
                 queue.appendleft(vertex_list + [neighbour])
         if verbose:
             print()
@@ -230,35 +234,35 @@ def djikstra(graph, starting_vertex, goal_vertex, verbose=False):
             print()
 
 
-g = Graph()
-g.add_edge(('A', 'B'))
-g.add_edge(('B', 'C'))
-g.add_edge(('C', 'D'))
-g.add_edge(('D', 'E'))
-g.add_edge(('E', 'F'))
-g.add_edge(('F', 'G'))
-g.add_edge(('G', 'H'))
-g.add_edge(('H', 'I'))
-g.add_edge(('I', 'J'))
-g.add_edge(('J', 'A'))
-g.add_edge(('C', 'H'))
+if __name__ == '__main__':
+    g = Graph()
+    g.add_edge(('A', 'B'))
+    g.add_edge(('B', 'C'))
+    g.add_edge(('C', 'D'))
+    g.add_edge(('D', 'E'))
+    g.add_edge(('E', 'F'))
+    g.add_edge(('F', 'G'))
+    g.add_edge(('G', 'H'))
+    g.add_edge(('H', 'I'))
+    g.add_edge(('I', 'J'))
+    g.add_edge(('J', 'A'))
+    g.add_edge(('C', 'H'))
 
-depth_first_search_traversal(graph=g.graph_dict, starting_vertex='A', goal_vertex='F', verbose=True)
+    # depth_first_search_traversal(graph=g.graph_dict, starting_vertex='A', goal_vertex='F', verbose=True)
 
-path = breadth_first_search_find_path(graph=g.graph_dict, starting_vertex='A', goal_vertex='F')
-print(path)
+    path = breadth_first_search_find_path(graph=g.graph_dict, starting_vertex='A', goal_vertex='F', verbose=True)
+    print(path)
 
+    wg = WeightedGraph()
+    wg.add_edge(('A', 'B'), 7)
+    wg.add_edge(('B', 'C'), 10)
+    wg.add_edge(('A', 'C'), 9)
+    wg.add_edge(('B', 'D'), 15)
+    wg.add_edge(('C', 'D'), 11)
+    wg.add_edge(('A', 'E'), 14)
+    wg.add_edge(('C', 'E'), 2)
+    wg.add_edge(('E', 'F'), 9)
+    wg.add_edge(('F', 'D'), 6)
 
-wg = WeightedGraph()
-wg.add_edge(('A', 'B'), 7)
-wg.add_edge(('B', 'C'), 10)
-wg.add_edge(('A', 'C'), 9)
-wg.add_edge(('B', 'D'), 15)
-wg.add_edge(('C', 'D'), 11)
-wg.add_edge(('A', 'E'), 14)
-wg.add_edge(('C', 'E'), 2)
-wg.add_edge(('E', 'F'), 9)
-wg.add_edge(('F', 'D'), 6)
-
-cost, path = djikstra(wg.graph_dict, 'A', 'F', True)
-print(cost, path)
+    cost, path = djikstra(wg.graph_dict, 'A', 'F', True)
+    print(cost, path)
