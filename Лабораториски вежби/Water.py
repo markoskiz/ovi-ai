@@ -18,14 +18,16 @@ def expand_state(state):
 
 
 def search_path(initial_state, goal_state):
+    visited = {initial_state}
     states_queue = deque([[initial_state]])
     while states_queue:
         states_list = states_queue.popleft()
         state_to_expand = states_list[-1]
         for next_state in expand_state(state_to_expand):
-            if next_state not in states_list:
+            if next_state not in visited:
                 if next_state[0] == goal_state:
                     return states_list + [next_state]
+                visited.add(next_state)
                 states_queue.append(states_list + [next_state])
     return []
 

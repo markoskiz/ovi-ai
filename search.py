@@ -248,7 +248,7 @@ if __name__ == '__main__':
     g.add_edge(('J', 'A'))
     g.add_edge(('C', 'H'))
 
-    # depth_first_search_traversal(graph=g.graph_dict, starting_vertex='A', goal_vertex='F', verbose=True)
+    depth_first_search_traversal(graph=g.graph_dict, starting_vertex='A', goal_vertex='F', verbose=True)
 
     path = breadth_first_search_find_path(graph=g.graph_dict, starting_vertex='A', goal_vertex='F', verbose=True)
     print(path)
