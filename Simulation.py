@@ -1,9 +1,11 @@
 from collections import deque
+from time import sleep
+import heapq
 import numpy as np
 from matplotlib import pyplot as plt
-import heapq
 
 world_shape = 20, 20
+path_color = (0.8, 0.5, 0.8)
 agent_color = (0.8, 0, 0)
 world_color = (1, 1, 0.8)
 expanded_state_color = (0.5, 0.8, 0.5)
@@ -24,37 +26,38 @@ class Simulation:
         self.world_weight = world_weight
         self.clean_world()
 
-    def update_screen(self, image):
+    def update_screen(self):
         plt.cla()
-        self.ax.imshow(image)
+        self.ax.imshow(self.world)
         self.figure.canvas.draw()
         self.figure.canvas.flush_events()
 
     def blind_search_visualised(self, search_algorithm):
         initial_state = self.agent
-        states_queue = deque([initial_state])
+        states_queue = deque([[initial_state]])
         visited = {initial_state}
         while states_queue:
-            state_to_expand = states_queue.popleft()
+            states_list = states_queue.popleft()
+            state_to_expand = states_list[-1]
             if state_to_expand != initial_state:
                 self.world[state_to_expand] = expanded_state_color
             for next_state in self.expand_state(state_to_expand):
                 if next_state not in visited:
                     visited.add(next_state)
                     if next_state == self.goal:
-                        return
+                        return states_list + [next_state]
                     if search_algorithm == 'breadth':
-                        states_queue.append(next_state)
+                        states_queue.append(states_list + [next_state])
                     elif search_algorithm == 'depth':
-                        states_queue.appendleft(next_state)
+                        states_queue.appendleft(states_list + [next_state])
                     else:
                         raise AttributeError('{} is not a valid algorithm'.format(search_algorithm))
-
                     if all(self.world[next_state] != expanded_state_color):
                         self.world[next_state] = visited_state_color
-            self.update_screen(self.world)
+            self.update_screen()
+        return []
 
-    def a_star_search_visualised(self, alpha, distance='manhattan'):
+    def a_star_search_visualised(self, alpha, distance=None):
         """
         A* algorithm
         :param alpha: ratio between path cost and heuristic. weight = path_so_far + alpha * heuristic
@@ -63,27 +66,29 @@ class Simulation:
         """
         initial_state = self.agent
         expanded = set()
-        states_queue = [(0, initial_state)]
+        states_queue = [(0, [initial_state])]
         heapq.heapify(states_queue)
         while states_queue:
-            current_weight, state_to_expand = heapq.heappop(states_queue)
+            current_weight, states_list = heapq.heappop(states_queue)
+            state_to_expand = states_list[-1]
             if state_to_expand != initial_state:
                 self.world[state_to_expand] = expanded_state_color
             if state_to_expand == self.goal:
-                return
+                return states_list
             if state_to_expand in expanded:
                 continue
             for next_state in self.expand_state(state_to_expand):
                 transition_weight = self.world_weight[next_state] - self.world_weight[state_to_expand]
-                djikstra_weight = 0.01 + current_weight + transition_weight
-                heuristic_weight = self.distance(self.goal, next_state, distance)
+                djikstra_weight = current_weight + transition_weight
+                heuristic_weight = self.distance(self.goal, next_state, distance) if distance else 0
                 a_star_weight = (1 - alpha) * djikstra_weight + alpha * heuristic_weight
                 if next_state not in expanded:
                     if all(self.world[next_state] != expanded_state_color):
                         self.world[next_state] = visited_state_color
-                    heapq.heappush(states_queue, (a_star_weight, next_state))
+                    heapq.heappush(states_queue, (a_star_weight, states_list + [next_state]))
             expanded.add(state_to_expand)
-            self.update_screen(self.world)
+            self.update_screen()
+        return []
 
     @staticmethod
     def expand_state(state):
@@ -114,41 +119,46 @@ class Simulation:
         self.world[self.agent] = agent_color
         self.world[self.goal] = goal_color
 
-    def simulate(self):
-        self.clean_world()
-        plt.suptitle('Depth first search')
-        self.blind_search_visualised('depth')
-        plt.imsave('images/dfs.png', self.world)
+    def draw_path(self, path):
+        self.world[self.agent] = agent_color
+        for state in path[1:-1]:
+            self.world[state] = path_color
+        self.world[self.goal] = goal_color
+        self.update_screen()
+        sleep(2)
 
+    def simulate_algorithm(self, algorithm, a_star_alpha=None, distance=None):
         self.clean_world()
-        plt.suptitle('Breadth first search')
-        self.blind_search_visualised('breadth')
-        plt.imsave('images/bfs.png', self.world)
 
-        self.clean_world()
-        plt.suptitle('Djikstra search')
-        self.a_star_search_visualised(0)
-        plt.imsave('images/djikstra.png', self.world)
+        suptitle = {'depth': 'Depth first search', 'breadth': 'Breadth first search', 'djikstra': 'Djikstra search',
+                    'greedy': 'Greedy search', 'a_star': 'A star'}
+        if algorithm == 'a_star':
+            filename = 'images/{}_{}_{:.3f}.png'.format(algorithm, distance, a_star_alpha)
+            plt.suptitle('{} {} {:.3f}'.format(suptitle[algorithm], distance, a_star_alpha))
+        elif algorithm == 'greedy':
+            filename = 'images/{}_{}.png'.format(algorithm, distance)
+            plt.suptitle('{} {}'.format(suptitle[algorithm], distance))
+        else:
+            filename = 'images/{}.png'.format(algorithm)
+            plt.suptitle(suptitle[algorithm])
 
-        self.clean_world()
-        plt.suptitle('Greedy search manhattan')
-        self.a_star_search_visualised(1, 'manhattan')
-        plt.imsave('images/greedy_manhattan.png', self.world)
+        if algorithm in ['depth', 'breadth']:
+            path = self.blind_search_visualised(algorithm)
+        else:
+            alpha = 0 if algorithm == 'djikstra' else 1 if algorithm == 'greedy' else a_star_alpha
+            path = self.a_star_search_visualised(alpha, distance)
 
-        self.clean_world()
-        plt.suptitle('Greedy search euclidean')
-        self.a_star_search_visualised(1, 'euclidean')
-        plt.imsave('images/greedy_euclidean.png', self.world)
+        self.draw_path(path)
+        plt.imsave(filename, self.world)
 
-        self.clean_world()
-        plt.suptitle('A star search manhattan')
-        self.a_star_search_visualised(0.8, 'manhattan')
-        plt.imsave('images/a_star_manhattan.png', self.world)
-
-        self.clean_world()
-        plt.suptitle('A star search euclidean')
-        self.a_star_search_visualised(0.2, 'euclidean')
-        plt.imsave('images/a_star_euclidean.png', self.world)
+    def simulate_all(self):
+        self.simulate_algorithm('depth')
+        self.simulate_algorithm('breadth')
+        self.simulate_algorithm('djikstra')
+        self.simulate_algorithm('greedy', distance='manhattan')
+        self.simulate_algorithm('greedy', distance='euclidean')
+        self.simulate_algorithm('a_star', a_star_alpha=0.8, distance='manhattan')
+        self.simulate_algorithm('a_star', a_star_alpha=0.8, distance='euclidean')
 
 
 def calc_cost(x, y):
@@ -168,12 +178,12 @@ def world_weight_playground():
 
 
 def main():
-    agent = world_shape[0] // 2, 0
-    goal = world_shape[0] - 1 - 1, world_shape[1] - 1 - 1
+    agent = world_shape[0] // 2, world_shape[1] // 5
+    goal = world_shape[0] // 5, 4 * world_shape[1] // 5
     world = np.zeros((world_shape[0], world_shape[1], 3), dtype=np.float)
     world_weight = world_weight_playground()
     sim = Simulation(agent, goal, world, world_weight)
-    sim.simulate()
+    sim.simulate_all()
 
 
 main()
