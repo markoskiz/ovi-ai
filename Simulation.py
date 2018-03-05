@@ -5,12 +5,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 world_shape = 20, 20
+wall_notation = 0
 path_color = (0.8, 0.5, 0.8)
 agent_color = (0.8, 0, 0)
 world_color = (1, 1, 0.8)
 expanded_state_color = (0.5, 0.8, 0.5)
 visited_state_color = (0.8, 1, 0.8)
 goal_color = (0, 0, 0.8)
+wall_color = (0, 0, 0)
 
 
 class Simulation:
@@ -66,10 +68,11 @@ class Simulation:
         """
         initial_state = self.agent
         expanded = set()
-        states_queue = [(0, [initial_state])]
+        states_queue = [((0, 0), [initial_state])]
         heapq.heapify(states_queue)
         while states_queue:
             current_weight, states_list = heapq.heappop(states_queue)
+            current_a_star_weight, current_path_weight = current_weight
             state_to_expand = states_list[-1]
             if state_to_expand != initial_state:
                 self.world[state_to_expand] = expanded_state_color
@@ -79,19 +82,20 @@ class Simulation:
                 continue
             for next_state in self.expand_state(state_to_expand):
                 transition_weight = self.world_weight[next_state] - self.world_weight[state_to_expand]
-                djikstra_weight = current_weight + transition_weight
+                step_cost = 0.01
+                transition_weight = step_cost + max(transition_weight, 0)
+                djikstra_weight = current_path_weight + transition_weight
                 heuristic_weight = self.distance(self.goal, next_state, distance) if distance else 0
                 a_star_weight = (1 - alpha) * djikstra_weight + alpha * heuristic_weight
                 if next_state not in expanded:
                     if all(self.world[next_state] != expanded_state_color):
                         self.world[next_state] = visited_state_color
-                    heapq.heappush(states_queue, (a_star_weight, states_list + [next_state]))
+                    heapq.heappush(states_queue, ((a_star_weight, djikstra_weight), states_list + [next_state]))
             expanded.add(state_to_expand)
             self.update_screen()
         return []
 
-    @staticmethod
-    def expand_state(state):
+    def expand_state(self, state):
         agent_i, agent_j = state
         new_states = []
         if agent_i > 0:
@@ -102,6 +106,7 @@ class Simulation:
             new_states.append((agent_i + 1, agent_j))
         if agent_j < world_shape[1] - 1:
             new_states.append((agent_i, agent_j + 1))
+        new_states = [new_state for new_state in new_states if self.world_weight[new_state] != wall_notation]
         return new_states
 
     @staticmethod
@@ -157,8 +162,8 @@ class Simulation:
         self.simulate_algorithm('djikstra')
         self.simulate_algorithm('greedy', distance='manhattan')
         self.simulate_algorithm('greedy', distance='euclidean')
-        self.simulate_algorithm('a_star', a_star_alpha=0.8, distance='manhattan')
-        self.simulate_algorithm('a_star', a_star_alpha=0.8, distance='euclidean')
+        self.simulate_algorithm('a_star', a_star_alpha=0.01, distance='manhattan')
+        self.simulate_algorithm('a_star', a_star_alpha=0.01, distance='euclidean')
 
 
 def calc_cost(x, y):
@@ -170,6 +175,7 @@ def world_weight_playground():
     world_weight = np.array([calc_cost(x, y) for x in range(world_shape[0]) for y in range(world_shape[1])])
     world_weight = world_weight.reshape(world_shape)
     world_weight = 1 - world_weight / np.max(world_weight)
+    world_weight[:4 * world_shape[0] // 5, world_shape[1] // 2] = wall_notation
     plt.suptitle('World weight')
     plt.imshow(world_weight)
     plt.colorbar()
@@ -182,6 +188,7 @@ def main():
     goal = world_shape[0] // 5, 4 * world_shape[1] // 5
     world = np.zeros((world_shape[0], world_shape[1], 3), dtype=np.float)
     world_weight = world_weight_playground()
+    world[world_weight == wall_notation] = wall_color
     sim = Simulation(agent, goal, world, world_weight)
     sim.simulate_all()
 
