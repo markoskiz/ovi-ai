@@ -1,3 +1,4 @@
+import os
 from collections import deque
 from time import sleep
 import heapq
@@ -184,6 +185,10 @@ def world_weight_playground():
 
 
 def main():
+    directory = 'images'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
     agent = world_shape[0] // 2, world_shape[1] // 5
     goal = world_shape[0] // 5, 4 * world_shape[1] // 5
     world = np.zeros((world_shape[0], world_shape[1], 3), dtype=np.float)
