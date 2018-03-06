@@ -5,6 +5,7 @@ import heapq
 import numpy as np
 from matplotlib import pyplot as plt
 
+image_directory = 'search images'
 world_shape = 20, 20
 wall_notation = 0
 path_color = (0.8, 0.5, 0.8)
@@ -139,13 +140,13 @@ class Simulation:
         suptitle = {'depth': 'Depth first search', 'breadth': 'Breadth first search', 'djikstra': 'Djikstra search',
                     'greedy': 'Greedy search', 'a_star': 'A star'}
         if algorithm == 'a_star':
-            filename = 'images/{}_{}_{:.3f}.png'.format(algorithm, distance, a_star_alpha)
+            filename = '{}/{}_{}_{:.3f}.png'.format(image_directory, algorithm, distance, a_star_alpha)
             plt.suptitle('{} {} {:.3f}'.format(suptitle[algorithm], distance, a_star_alpha))
         elif algorithm == 'greedy':
-            filename = 'images/{}_{}.png'.format(algorithm, distance)
+            filename = '{}/{}_{}.png'.format(image_directory, algorithm, distance)
             plt.suptitle('{} {}'.format(suptitle[algorithm], distance))
         else:
-            filename = 'images/{}.png'.format(algorithm)
+            filename = '{}/{}.png'.format(image_directory, algorithm)
             plt.suptitle(suptitle[algorithm])
 
         if algorithm in ['depth', 'breadth']:
@@ -185,9 +186,8 @@ def world_weight_playground():
 
 
 def main():
-    directory = 'images'
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    if not os.path.exists(image_directory):
+        os.makedirs(image_directory)
 
     agent = world_shape[0] // 2, world_shape[1] // 5
     goal = world_shape[0] // 5, 4 * world_shape[1] // 5
