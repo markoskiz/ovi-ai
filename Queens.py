@@ -67,6 +67,7 @@ def visualise_queens(queens):
         table[:, index * queen.shape[1] - margin: index * queen.shape[1] + margin] = border_color
     plt.imsave('{}/{}.png'.format(image_directory, N), table)
     plt.imshow(table)
+    plt.title('Queen problem solution N = {}'.format(N))
     plt.show()
 
 
