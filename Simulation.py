@@ -87,7 +87,7 @@ class Simulation:
                 step_cost = 0.01
                 transition_weight = step_cost + max(transition_weight, 0)
                 djikstra_weight = current_path_weight + transition_weight
-                heuristic_weight = self.distance(self.goal, next_state, distance) if distance else 0
+                heuristic_weight = step_cost * self.distance(self.goal, next_state, distance) if distance else 0
                 a_star_weight = (1 - alpha) * djikstra_weight + alpha * heuristic_weight
                 if next_state not in expanded:
                     if all(self.world[next_state] != expanded_state_color):
@@ -164,8 +164,8 @@ class Simulation:
         self.simulate_algorithm('djikstra')
         self.simulate_algorithm('greedy', distance='manhattan')
         self.simulate_algorithm('greedy', distance='euclidean')
-        self.simulate_algorithm('a_star', a_star_alpha=0.01, distance='manhattan')
-        self.simulate_algorithm('a_star', a_star_alpha=0.01, distance='euclidean')
+        self.simulate_algorithm('a_star', a_star_alpha=0.5, distance='manhattan')
+        self.simulate_algorithm('a_star', a_star_alpha=0.5, distance='euclidean')
 
 
 def calc_cost(x, y):
