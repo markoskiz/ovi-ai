@@ -1,8 +1,11 @@
 import math
 from graph import Graph
 
-g = Graph()
 
+plus_inf = float('inf')
+minus_inf = float('-inf')
+
+g = Graph()
 g.add_edge(('A', 'B'), add_reversed=False)
 g.add_edge(('A', 'C'), add_reversed=False)
 g.add_edge(('A', 'D'), add_reversed=False)
@@ -25,11 +28,7 @@ g.add_edge(('I', 'T'), add_reversed=False)
 g.add_edge(('J', 'U'), add_reversed=False)
 g.add_edge(('J', 'V'), add_reversed=False)
 
-plus_inf = float('inf')
-minus_inf = float('-inf')
-values = {'A': minus_inf, 'B': plus_inf, 'C': plus_inf, 'D': plus_inf, 'E': minus_inf, 'F': minus_inf, 'G': minus_inf,
-          'H': minus_inf, 'I': minus_inf, 'J': minus_inf, 'K': 4, 'L': 6, 'M': 7, 'N': 9, 'O': 1, 'P': 2, 'Q': 0,
-          'R': 1, 'S': 8, 'T': 1, 'U': 9, 'V': 2}
+leafs = {'K': 4, 'L': 6, 'M': 7, 'N': 9, 'O': 1, 'P': 2, 'Q': 0, 'R': 1, 'S': 8, 'T': 1, 'U': 9, 'V': 2}
 
 
 def other_player(player):
@@ -37,8 +36,8 @@ def other_player(player):
 
 
 def minimax(graph, node, player):
-    if not math.isinf(values[node]):
-        return values[node]
+    if node in leafs and not math.isinf(leafs[node]):
+        return leafs[node]
     best = plus_inf if player == 'MIN' else minus_inf
     for child in graph[node]:
         result = minimax(graph, child, other_player(player))
@@ -49,5 +48,30 @@ def minimax(graph, node, player):
     return best
 
 
+def minimax_alpha_beta(graph, node, player, alpha=minus_inf, beta=plus_inf):
+    if node in leafs and not math.isinf(leafs[node]):
+        return leafs[node]
+    best = plus_inf if player == 'MIN' else minus_inf
+    for child in graph[node]:
+        result = minimax_alpha_beta(graph, child, other_player(player), alpha, beta)
+        if player == 'MIN':
+            if result <= alpha:
+                return result
+            if result < beta:
+                beta = result
+            if result < best:
+                best = result
+        elif player == 'MAX':
+            if result >= beta:
+                return result
+            if result > alpha:
+                alpha = result
+            if result > best:
+                best = result
+    return best
+
+
 game_result = minimax(g.graph_dict, 'A', 'MAX')
+print(game_result)
+game_result = minimax_alpha_beta(g.graph_dict, 'A', 'MAX')
 print(game_result)
