@@ -1,4 +1,3 @@
-import math
 from graph import Graph
 
 
@@ -36,7 +35,7 @@ def other_player(player):
 
 
 def minimax(graph, node, player):
-    if node in leafs and not math.isinf(leafs[node]):
+    if node in leafs:
         return leafs[node]
     best = plus_inf if player == 'MIN' else minus_inf
     for child in graph[node]:
@@ -49,7 +48,7 @@ def minimax(graph, node, player):
 
 
 def minimax_alpha_beta(graph, node, player, alpha=minus_inf, beta=plus_inf):
-    if node in leafs and not math.isinf(leafs[node]):
+    if node in leafs:
         return leafs[node]
     best = plus_inf if player == 'MIN' else minus_inf
     for child in graph[node]:
