@@ -83,7 +83,7 @@ def ProveriPobeda(tabla,z):
                 return True
     #Ocenuvanje na leva dijagonala
     for i in range(3):
-        for j in range(4,7):
+        for j in range(3,7):
             if (tabla[i][j]==z and tabla[i+1][j-1] == z and tabla[i+2][j-2]==z and tabla[i+3][j-3]==z):
                 return True
     return False
