@@ -1,9 +1,9 @@
 from collections import defaultdict
 
 
-class Graph(object):
-    def __init__(self, graph_dict=defaultdict(list)):
-        self.graph_dict = graph_dict
+class Graph():
+    def __init__(self):
+        self.graph_dict = {}
 
     def vertices(self):
         return list(self.graph_dict.keys())
@@ -51,8 +51,8 @@ class Graph(object):
 
 
 class WeightedGraph(object):
-    def __init__(self, graph_dict=defaultdict(dict)):
-        self.graph_dict = graph_dict
+    def __init__(self):
+        self.graph_dict = defaultdict(dict)
 
     def vertices(self):
         return list(self.graph_dict.keys())
