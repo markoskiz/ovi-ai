@@ -1,3 +1,5 @@
+#!/bin/bash
+
 remote_branches=false
 git remote show origin | while read line; do
     if [ "$line" == "Remote branches:" ]; then
