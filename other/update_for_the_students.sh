@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # execute update_master first
-$(dirname $(readlink -f $0))/update_master.sh
+$(dirname $(readlink -f $0))/update_for_the_master.sh
 
 remote_branches=false
 git remote show origin | while read line; do
