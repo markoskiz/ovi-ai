@@ -1,7 +1,7 @@
 from time import sleep
 import random
 
-BOARD_SIZE = 6
+BOARD_SIZE = 4
 PAWN_ACTIONS = ['a', 'l', 'r']
 EMPTY_SQUARE = '\u00B7'
 

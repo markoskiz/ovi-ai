@@ -1,5 +1,5 @@
 from copy import deepcopy
-import pawns_ai_player as player1
+import pawns_human_player as player1
 import pawns_ai_player as player2
 
 
@@ -89,5 +89,5 @@ class Board:
         return True if self.player_2_sign in self.board[0] or self.player_1_sign in self.board[-1] else False
 
 
-board = Board(player1, player2)
+board = Board(player1, player2, board_size=4)
 board.play()
