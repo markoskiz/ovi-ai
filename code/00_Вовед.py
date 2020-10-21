@@ -5,7 +5,7 @@
 """
 import math
 from time import sleep
-import graph
+
 
 # ова е коментар
 
@@ -136,7 +136,7 @@ colors = {
 print(colors['Blue'])
 
 # читаме од датотека
-text = open('Colors.txt').read().strip()
+text = open('data/Colors.txt').read().strip()
 print(text)
 print()
 # делиме на редови
@@ -173,40 +173,4 @@ class OneWheelRobot:
 
 robot = OneWheelRobot(math.pi, 3, 5)
 print(robot)
-print()
-
-
-cities = {"Скопје": ["Загреб"],
-          "Белград": ["Загреб", "Подгорица"],
-          "Загреб": ["Скопје", "Белград", "Сараево", "Подгорица"],
-          "Сараево": ["Загреб"],
-          "Подгорица": ["Загреб", "Белград"],
-          "Софија": []
-          }
-
-g = graph.Graph(cities)
-print(g, '\n')
-
-print('Ова е листа на изолирани градови. Значи ако загливите тука не одите никаде')
-print(g.isolated_vertices(), '\n')
-print()
-
-print('Ја додаваме Љубљана')
-g.add_vertex("Љубљана")
-print(g)
-print()
-
-print('Додаваме лет Загреб -> Љубљана')
-g.add_edge(('Загреб', 'Љубљана'))
-print(g)
-print()
-
-print('Го бришеме Загреб')
-g.remove_vertex('Загреб')
-print(g)
-print()
-
-print('Го бришеме летот Белград - Подгорица')
-g.remove_edge(('Белград', 'Подгорица'), remove_reversed=False)
-print(g)
 print()
