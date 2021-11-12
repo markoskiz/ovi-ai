@@ -178,7 +178,7 @@ def uniform_cost_search(graph, starting_vertex, goal_vertex, verbose=False):
             print()
 
 
-def a_star_search(graph, starting_vertex, goal_vertex, heuristic_function, alpha, verbose=False):
+def a_star_search(graph, starting_vertex, goal_vertex, heuristic_function, alpha=1, verbose=False):
     """
     Returns the path from starting_vertex to goal_vertex using the A-star search algorithm.
     """
@@ -217,12 +217,12 @@ def a_star_search(graph, starting_vertex, goal_vertex, heuristic_function, alpha
         if vertex_to_expand == goal_vertex:
             if verbose:
                 print('Го пронајдовме посакуваниот јазол {}. Патеката да стигнеме до тука е {} со цена {}'
-                      .format(vertex_to_expand, vertex_list, weight))
+                      .format(vertex_to_expand, vertex_list, current_path_weight))
             return current_path_weight, vertex_list
         # Ако веќе сме го разграниле овој јазол, нема логика да го разгрануваме пак.
         if vertex_to_expand in expanded:
             if verbose:
-                print('{} е веќе разгранет'.format(vertex_to_expand, weight, vertex_list))
+                print('{} е веќе разгранет'.format(vertex_to_expand, current_path_weight, vertex_list))
             continue
         if verbose:
             print('Го разгрануваме јазолот {} од ({}, {})'.format(vertex_to_expand, current_path_weight, vertex_list))
