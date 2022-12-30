@@ -80,6 +80,8 @@ def get_move_official(queue, state, symbol):
 
 
 def get_move(state, symbol):
+    other_symbol = 'S' if symbol == 'P' else 'P'
+    minimax.scores = {symbol: 1, other_symbol: -1}
     result, move = minimax(state, 'MAX', symbol)
     return move
 
@@ -87,8 +89,7 @@ def get_move(state, symbol):
 def minimax(state, player, symbol, alpha=-2, beta=2, depth=0):
     winner = check_victory(state, symbol)
     if winner != 'keep_playing':
-        scores = {'S': 1, 'P': -1}
-        return scores[winner], None
+        return minimax.scores[winner], None
     # пример како да се прекине со пребарување после длабочина 3
     if depth == 3:
         return evaluate_state(state, symbol), None
@@ -96,7 +97,7 @@ def minimax(state, player, symbol, alpha=-2, beta=2, depth=0):
     best_move = None
     for child, move in expand_state(state, symbol):
         other_player = 'MIN' if player == 'MAX' else 'MAX'
-        other_symbol = 'S' if player == 'P' else 'P'
+        other_symbol = 'S' if symbol == 'P' else 'P'
         result, _ = minimax(
             child, other_player, other_symbol, alpha, beta, depth+1)
         if player == 'MIN':
