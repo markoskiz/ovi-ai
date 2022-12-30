@@ -29,8 +29,7 @@ def possible_moves(state, x, y):
             ny += dy
 
 
-def expand_state(state, player):
-    symbol = 'S' if player == 'MAX' else 'P'
+def expand_state(state, symbol):
     qx, qy = find_queen(state, symbol)
     for mx, my in possible_moves(state, qx, qy):
         state_after_move = list([list(row) for row in state])
@@ -82,8 +81,6 @@ def get_move_official(queue, state, symbol):
 
 def get_move(state, symbol):
     result, move = minimax(state, 'MAX', symbol)
-    # print('AAAAAAAAAAAAAAAAAAAAAAA', flush=True)
-    print('CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC')
     return move
 
 
@@ -97,7 +94,7 @@ def minimax(state, player, symbol, alpha=-2, beta=2, depth=0):
         return evaluate_state(state, symbol), None
     best_value = 2 if player == 'MIN' else -2
     best_move = None
-    for child, move in expand_state(state, player):
+    for child, move in expand_state(state, symbol):
         other_player = 'MIN' if player == 'MAX' else 'MAX'
         other_symbol = 'S' if player == 'P' else 'P'
         result, _ = minimax(

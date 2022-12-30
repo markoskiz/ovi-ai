@@ -8,8 +8,9 @@ from IPython import display
 
 
 class Game:
-    def __init__(self, state, player_1, player_2):
+    def __init__(self, state, player_1, player_2, time_to_play=10):
         self.N = len(state)
+        self.time_to_play = time_to_play
         self.state_original = state
         self.state = deepcopy(self.state_original)
         self.player_1 = {**player_1, 'symbol': 'S'}
@@ -20,8 +21,10 @@ class Game:
         self.scores = {'S': 1, 'P': -1}
         self.create_ui()
         hbox = ipw.HBox([self.bt_restart, self.dashboard])
+        self.output = ipw.Output()
+        vbox = ipw.VBox([hbox, self.fig, self.output])
         self.restart()
-        display.display(ipw.VBox([hbox, self.fig]))
+        display.display(vbox)
 
     def restart(self, *args):
         self.h_calls = 0
@@ -35,6 +38,7 @@ class Game:
         self.evaluated = {}
         self.fig.data[0].marker.symbol = self.convert_state_to_symbols()
         self.winner = 'keep_playing'
+        self.output.clear_output()
 
     def ck_bt_restart(self, bt_restart):
         self.restart()
@@ -74,40 +78,50 @@ class Game:
             self.ai_move()
 
     def its_valid_response(self, move):
-        if type(move) is not tuple or len(move) != 4:
-            return False
+        if move == 'did not respond':
+            return False, 'Player did not respond in time.'
+        if move is None:
+            return False, 'Player\'s response is None.'
+        if type(move) not in [tuple, list]:
+            return False, 'Player\'s response is not a tuple or a list.'
+        if len(move) != 4:
+            return False, 'Player\'s response is not a tuple of length 4.'
         mx, my, sx, sy = move
         if any([type(v) is not int for v in move]):
-            return False
+            return False, 'Player\'s response contains non-integer values.'
         if any([v < 0 or v >= self.N for v in move]):
-            return False
+            return False, 'Player\'s response contains out of range values.'
         mx, my, sx, sy = move
         state = deepcopy(self.state)
         qx, qy = self.find_queen(state, self.next_to_play['symbol'])
         valid_queens = list(self.possible_moves(state, qx, qy))
         if (mx, my) not in valid_queens:
-            return False
+            msg = f'Queen tries to move to an occupied place {(mx, my)}.'
+            return False, msg
         state[my][mx] = state[qy][qx]
         state[qy][qx] = '·'
         valid_shots = list(self.possible_moves(state, mx, my))
         if (sx, sy) not in valid_shots:
-            return False
-        return True
+            return False, f'Queen tries to shoot an occupied place {(sx, sy)}.'
+        return True, ''
 
     def ai_move(self):
         self.dashboard.value += ' -- пресметува'
         name = self.next_to_play["name"]
         move = self.wait_for_player()
         qx, qy = self.find_queen(self.state, self.next_to_play['symbol'])
-        if self.its_valid_response(move):
-            print(f'{name} plays {move}.')
+        valid, reason = self.its_valid_response(move)
+        if valid:
+            self.print_to_dash(f'{name} plays {move}.')
             mx, my, sx, sy = move
             self.state[my][mx] = self.state[qy][qx]
             self.state[qy][qx] = '·'
             self.update_after_state_change()
             self.state[sy][sx] = 'x'
         else:
-            print(f'Invalid move for {name}. A random move will be played.')
+            msg = f'{name} - Invalid move: {reason}'
+            msg += ' A random move will be played.'
+            self.print_to_dash(msg)
             valid_queens = list(self.possible_moves(self.state, qx, qy))
             mx, my = random.choice(valid_queens)
             self.state[my][mx] = self.state[qy][qx]
@@ -119,15 +133,19 @@ class Game:
         self.update_after_state_change()
         self.player_took_turn()
 
+    def print_to_dash(self, msg):
+        with self.output:
+            display.display(msg)
+
     def wait_for_player(self):
-        move = None
+        move = 'did not respond'
         players_script = self.next_to_play['script']
         queue = mp.Queue()
         args = (queue, deepcopy(self.state), self.next_to_play['symbol'])
         process = mp.Process(
             target=players_script.get_move_official, args=args)
         process.start()
-        process.join(timeout=2)
+        process.join(timeout=self.time_to_play)
         if process.is_alive():
             process.terminate()
         else:
@@ -164,7 +182,8 @@ class Game:
 
     def update_after_state_change(self):
         self.fig.data[0].marker.symbol = self.convert_state_to_symbols()
-        sleep(1)
+        if self.next_to_play['type'] == 'AI':
+            sleep(1)
 
     def flip_next_player(self):
         if self.next_to_play == self.player_2:
